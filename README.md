@@ -32,6 +32,13 @@ The repository contains the following directories and files:
 * The file **LICENCE.txt** describes the licence of our code.
 * The file **README.md**, which is the current file.
 
+## __SETTING UP REPO AND ENVIRONMENT__
+
+git clone https://github.com/ConorGagliardi/hypersar/edit/master/README.md
+
+conda create --name hypersar python=3.8
+conda activate hypersar
+
 ## __Required libraries__
 
 The libraries required to run this code are indicated in the ``requirements.txt`` file. Using pip, the libraries can be simply installed using the following command:
