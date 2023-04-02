@@ -1,0 +1,4 @@
+set	type	recall@1	recall@10	recall@20	ndcg@20
+test	all-type	0.04797	0.20589	0.28531	0.13647
+test	rec-type	0.03775	0.18542	0.26807	0.12188
+test	search-type	0.05305	0.21608	0.29389	0.14374
