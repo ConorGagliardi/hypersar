@@ -34,10 +34,10 @@ The repository contains the following directories and files:
 
 ## __SETTING UP REPO AND ENVIRONMENT__
 
-git clone https://github.com/ConorGagliardi/hypersar/edit/master/README.md
+	git clone https://github.com/ConorGagliardi/hypersar/edit/master/README.md
 
-conda create --name hypersar python=3.8
-conda activate hypersar
+	conda create --name hypersar python=3.8
+	conda activate hypersar
 
 ## __Required libraries__
 
