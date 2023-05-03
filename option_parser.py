@@ -4,6 +4,11 @@ class OptParser(OptionParser):
 
     def __init__(self):
         OptionParser.__init__(self)
+        
+        self.add_option(
+            "--use_bert", action="store_true", dest="use_bert", 
+            default=False, help="pre-trained BERT embeddings instead of w2v"
+        )
 
         self.add_option(
             "--dataset", type="str",

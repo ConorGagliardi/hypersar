@@ -7,6 +7,7 @@ import io
 import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from datetime import datetime
+from transformers import BertModel, BertTokenizer#
 
 def load_data(file, delimiter):
     load_data = pd.read_csv(file, delimiter=delimiter)
@@ -25,27 +26,41 @@ def collect_token_set(data, options):
     return tokens
 
 def load_w2v_model(vectorizer, options):
-    w2v_path = "w2v/" + options.w2v_dir
-    data_dir = options.data_dir
-    tokens = vectorizer.get_feature_names()
+    if options.use_bert:#
+        print("Using pretrained bert instead of w2v--", datetime.now(), flush=True)
+        bert_model = BertModel.from_pretrained('bert-base-uncased')
+        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        w2v_dim = bert_model.config.hidden_size
+        
+        w2v_model = {}
+        for token in vectorizer.get_feature_names():
+            inputs = tokenizer(token, return_tensors="pt")
+            outputs = bert_model(**inputs)
+            w2v_model[token] = outputs.last_hidden_state[0, 0, :].detach().numpy()
+        
+    else:
+        print("using w2v--")
+        w2v_path = "w2v/" + options.w2v_dir
+        data_dir = options.data_dir
+        tokens = vectorizer.get_feature_names()
 
-    print("Loading the raw word2vec model...", datetime.now(), flush=True)
-    raw_w2v_model = {}
-    for line in io.open(w2v_path + os.sep + "raw_w2v", "r", encoding="utf-8", newline="\n", errors="ignore"):
-        line_split = line.rstrip().split(" ")
-        raw_w2v_model[line_split[0]] = np.asarray([float(e) for e in line_split[1:]])
-    w2v_dim = len(list(raw_w2v_model.values())[0]) # Take the embedding size from any element
+        print("Loading the raw word2vec model...", datetime.now(), flush=True)
+        raw_w2v_model = {}
+        for line in io.open(w2v_path + os.sep + "raw_w2v", "r", encoding="utf-8", newline="\n", errors="ignore"):
+            line_split = line.rstrip().split(" ")
+            raw_w2v_model[line_split[0]] = np.asarray([float(e) for e in line_split[1:]])
+        w2v_dim = len(list(raw_w2v_model.values())[0]) # Take the embedding size from any element
 
-    print("Restricting the raw word2vec model to identified vocabulary...", datetime.now(), flush=True)
-    w2v_model = {}
-    for token in tokens:
-        if token in raw_w2v_model:
-            w2v_model[token] = raw_w2v_model[token]
-        else:
-            # Randomly initialize the embeddings for out-of-vocabulary tokens
-            w2v_model[token] = np.random.randn(w2v_dim)
-    w2v_filename = "w2v_" + str(options.num_keyword) + ".p"
-    pickle.dump(w2v_model, gzip.open(data_dir + os.sep + w2v_filename, "wb"))
+        print("Restricting the raw word2vec model to identified vocabulary...", datetime.now(), flush=True)
+        w2v_model = {}
+        for token in tokens:
+            if token in raw_w2v_model:
+                w2v_model[token] = raw_w2v_model[token]
+            else:
+                # Randomly initialize the embeddings for out-of-vocabulary tokens
+                w2v_model[token] = np.random.randn(w2v_dim)
+        w2v_filename = "w2v_" + str(options.num_keyword) + ".p"
+        pickle.dump(w2v_model, gzip.open(data_dir + os.sep + w2v_filename, "wb"))
 
     return w2v_model
 
@@ -98,8 +113,18 @@ def build_vectorizer(data, options):
 def build_keyword_embed(vectorizer, w2v_model, options):
     keyword_pre_embeddings = torch.zeros((options.num_keyword, options.w2v_dim), dtype=torch.float)
 
+    if options.use_bert:
+        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        bert_model = BertModel.from_pretrained('bert-base-uncased')
+        
+        for (keyword, keyword_id) in vectorizer.vocabulary_.items():
+            inputs = tokenizer(keyword, return_tensors="pt")
+            outputs = bert_model(**inputs)
+            keyword_pre_embeddings[keyword_id, :] = outputs.last_hidden_state[0, 0, :].detach()
+            
     # Get the keyword embeddings from w2v_model
-    for (keyword, keyword_id) in vectorizer.vocabulary_.items():
-        keyword_pre_embeddings[keyword_id, :] = torch.tensor(w2v_model[keyword])
+    else:
+      for (keyword, keyword_id) in vectorizer.vocabulary_.items():
+          keyword_pre_embeddings[keyword_id, :] = torch.tensor(w2v_model[keyword])
 
     return keyword_pre_embeddings
