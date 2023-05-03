@@ -7,7 +7,7 @@ import io
 import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from datetime import datetime
-from transformers import BertModel, BertTokenizer#
+from transformers import BertModel, BertTokenizer
 
 def load_data(file, delimiter):
     load_data = pd.read_csv(file, delimiter=delimiter)
@@ -26,7 +26,7 @@ def collect_token_set(data, options):
     return tokens
 
 def load_w2v_model(vectorizer, options):
-    if options.use_bert:#
+    if options.use_bert:
         print("Using pretrained bert instead of w2v--", datetime.now(), flush=True)
         bert_model = BertModel.from_pretrained('bert-base-uncased')
         tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
