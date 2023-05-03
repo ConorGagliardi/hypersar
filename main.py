@@ -163,7 +163,7 @@ if options.use_query:
     else: # Empty vocabulary
         options.num_keyword = 0
 
-    if options.use_w2v:
+    if options.use_w2v or options.use_bert:
         # Load dense keyword embeddings based on a pretrained word2vec model
         w2v_filename = "w2v_" + str(options.num_keyword) + ".p"
         if not os.path.exists(options.data_dir + os.sep + w2v_filename):
@@ -172,7 +172,10 @@ if options.use_query:
         else:
             print("Loading the preprocessed w2v model... ", datetime.now(), flush=True)
             w2v_model = pickle.load(gzip.open(options.data_dir + os.sep + w2v_filename, "rb"))
-        options.w2v_dim = len(list(w2v_model.values())[0])
+        if options.use_bert:
+            options.w2v_dim = 768
+        else:
+            options.w2v_dim = len(list(w2v_model.values())[0]) #
 
         # Build pre-trained keyword embeddings based on word2vec embeddings
         options.keyword_pre_embeddings = build_keyword_embed(vectorizer, w2v_model, options)
