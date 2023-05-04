@@ -19,11 +19,6 @@ import random
 #######################################
 
 # Option definition
-
-
-
-
-
 optparser = OptParser()
 options = optparser.parse_args()[0]
 

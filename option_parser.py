@@ -6,12 +6,8 @@ class OptParser(OptionParser):
         OptionParser.__init__(self)
         
         self.add_option(
-            "--use_bert", action="store_true", dest="use_bert", 
-            default=False, help="pre-trained BERT-BASE embeddings instead of w2v"
-        )
-        self.add_option(
-            "--use_bert_large", action="store_true", dest="use_bert_large",
-            default=False, help="pre-trained BERT-LARGE embeddings instead of w2v"
+            "--bert", action="store_true", dest="use_bert",
+            default=False, help="pre-trained BERT embeddings instead of w2v"
         )
 
         self.add_option(
