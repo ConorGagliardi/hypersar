@@ -28,16 +28,14 @@ def collect_token_set(data, options):
 def load_w2v_model(vectorizer, options):
     if options.use_bert:
         print("Using pretrained bert instead of w2v--", datetime.now(), flush=True)
-        bert_model = BertModel.from_pretrained('bert-base-uncased')
-        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        bert_model = BertModel.from_pretrained('bert-{0}-uncased'.format(options.use_bert))
+        tokenizer = BertTokenizer.from_pretrained('bert-{0}-uncased'.format(options.use_bert))
         w2v_dim = bert_model.config.hidden_size
-        
         w2v_model = {}
         for token in vectorizer.get_feature_names():
             inputs = tokenizer(token, return_tensors="pt")
             outputs = bert_model(**inputs)
             w2v_model[token] = outputs.last_hidden_state[0, 0, :].detach().numpy()
-        
     else:
         print("using w2v--")
         w2v_path = "w2v/" + options.w2v_dir
@@ -114,8 +112,8 @@ def build_keyword_embed(vectorizer, w2v_model, options):
     keyword_pre_embeddings = torch.zeros((options.num_keyword, options.w2v_dim), dtype=torch.float)
 
     if options.use_bert:
-        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        bert_model = BertModel.from_pretrained('bert-base-uncased')
+        tokenizer = BertTokenizer.from_pretrained('bert-{0}-uncased'.format(options.use_bert))
+        bert_model = BertModel.from_pretrained('bert-{0}-uncased'.format(options.use_bert))
         
         for (keyword, keyword_id) in vectorizer.vocabulary_.items():
             inputs = tokenizer(keyword, return_tensors="pt")
