@@ -173,7 +173,7 @@ if options.use_query:
             print("Loading the preprocessed w2v model... ", datetime.now(), flush=True)
             w2v_model = pickle.load(gzip.open(options.data_dir + os.sep + w2v_filename, "rb"))
         if options.use_bert:
-            options.w2v_dim = 768
+            options.w2v_dim = 768 #size of bert base
         else:
             options.w2v_dim = len(list(w2v_model.values())[0]) #
 
