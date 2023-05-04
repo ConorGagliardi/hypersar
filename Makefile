@@ -9,6 +9,6 @@ bert:
 help:
 	@echo "############### Options: ###############"
 	@echo "install: install requirements"
-	@echo "word2vec: run without BERT embeddings"
-	@echo "bertembeddings: run with BERT embeddings"
+	@echo "ftext: run without BERT embeddings"
+	@echo "bert: run with BERT embeddings"
 	@echo "########################################"
