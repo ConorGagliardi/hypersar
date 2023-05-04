@@ -31,13 +31,22 @@ def load_w2v_model(vectorizer, options):
         bert_model = BertModel.from_pretrained('bert-base-uncased')
         tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         w2v_dim = bert_model.config.hidden_size
-        
         w2v_model = {}
         for token in vectorizer.get_feature_names():
             inputs = tokenizer(token, return_tensors="pt")
             outputs = bert_model(**inputs)
             w2v_model[token] = outputs.last_hidden_state[0, 0, :].detach().numpy()
-        
+    elif options.use_bert_large:
+        print("Using pretrained bert instead of w2v--", datetime.now(), flush=True)
+        bert_model = BertModel.from_pretrained('bert-base-uncased')
+        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        w2v_dim = bert_model.config.hidden_size
+        w2v_model = {}
+        for token in vectorizer.get_feature_names():
+            inputs = tokenizer(token, return_tensors="pt")
+            outputs = bert_model(**inputs)
+            w2v_model[token] = outputs.last_hidden_state[0, 0, :].detach().numpy()
+
     else:
         print("using w2v--")
         w2v_path = "w2v/" + options.w2v_dir

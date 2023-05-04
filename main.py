@@ -19,6 +19,11 @@ import random
 #######################################
 
 # Option definition
+
+
+
+
+
 optparser = OptParser()
 options = optparser.parse_args()[0]
 
@@ -163,7 +168,7 @@ if options.use_query:
     else: # Empty vocabulary
         options.num_keyword = 0
 
-    if options.use_w2v or options.use_bert:
+    if options.use_w2v or options.use_bert or options.use_bert_large:
         # Load dense keyword embeddings based on a pretrained word2vec model
         w2v_filename = "w2v_" + str(options.num_keyword) + ".p"
         if not os.path.exists(options.data_dir + os.sep + w2v_filename):
@@ -174,6 +179,8 @@ if options.use_query:
             w2v_model = pickle.load(gzip.open(options.data_dir + os.sep + w2v_filename, "rb"))
         if options.use_bert:
             options.w2v_dim = 768
+        elif options.use_bert_large:
+            options.w2v_dim = 1024
         else:
             options.w2v_dim = len(list(w2v_model.values())[0]) #
 
