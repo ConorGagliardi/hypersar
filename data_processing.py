@@ -112,8 +112,8 @@ def build_keyword_embed(vectorizer, w2v_model, options):
     keyword_pre_embeddings = torch.zeros((options.num_keyword, options.w2v_dim), dtype=torch.float)
 
     if options.use_bert:
-        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        bert_model = BertModel.from_pretrained('bert-base-uncased')
+        tokenizer = BertTokenizer.from_pretrained('bert-{0}-uncased'.format(options.use_bert))
+        bert_model = BertModel.from_pretrained('bert-{0}-uncased'.format(options.use_bert))
         
         for (keyword, keyword_id) in vectorizer.vocabulary_.items():
             inputs = tokenizer(keyword, return_tensors="pt")
