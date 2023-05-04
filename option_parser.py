@@ -10,11 +10,6 @@ class OptParser(OptionParser):
             default=False, help="pre-trained BERT embeddings instead of w2v"
         )
         self.add_option(
-            "--bert_large", type= "str", dest="use_bert_large",
-            default=False, help="pre-trained BERT-LARGE embeddings instead of w2v"
-        )
-
-        self.add_option(
             "--dataset", type="str",
             help="name of the dataset to use for the experiment"
         )
