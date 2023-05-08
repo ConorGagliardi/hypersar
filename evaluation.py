@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import pandas as pd
 from datetime import datetime
 
 def precision(correct_predictions, k):
@@ -56,6 +57,37 @@ def evaluate(correct_predicted_interactions, num_true_interactions, metrics):
             eval_results[metric] = map(correct_predictions, num_true_interactions, k)
 
     return eval_results
+    
+    
+    
+#helper functions for returning hits
+def load_dictionaries(item_dict_path, tag_path):
+    item_dict = {}
+    with open(item_dict_path, "r", encoding='utf-8') as f:
+        for line in f:
+            old_id, new_id = line.strip().split("\t")
+            item_dict[int(new_id)] = int(old_id)
+    
+    tag_df = pd.read_csv(tag_path, sep="\t", encoding="unicode_escape")
+    tag_dict = {row["tagID"]: row["tagValue"] for _, row in tag_df.iterrows()}
+    
+    return item_dict, tag_dict
+    
+def load_artist_dictionary(artist_path):
+    artist_df = pd.read_csv(artist_path, sep="\t", encoding="unicode_escape")
+    artist_dict = {row["id"]: row["name"] for _, row in artist_df.iterrows()}
+    return artist_dict
+    
+
+def map_ids_to_values(example_user_id, example_query_keywords, example_top_10_hits, item_dict, tag_dict, artist_dict):
+    example_artist_ids = [item_dict[hit] for hit in example_top_10_hits]
+    example_artist_names = [artist_dict[artist_id] for artist_id in example_artist_ids]
+    example_query_tags = [tag_dict[keyword_id] for keyword_id in example_query_keywords]
+    return example_user_id, example_query_tags, example_artist_names
+    
+    
+    
+    
 
 def predict_evaluate(data_loader, options, model, known_interactions):
     max_k = max([metric[1] for metric in options.metrics])
@@ -63,6 +95,8 @@ def predict_evaluate(data_loader, options, model, known_interactions):
     types = ['all', 'rec', 'search']
     eval_results = {type: {metric: torch.tensor([], dtype=torch.float, device=options.device_ops)
                            for metric in options.metrics} for type in types}
+
+    print_example = True
 
     for (batch_id, batch) in enumerate(data_loader):
         if batch_id % 1 == 0:
@@ -78,7 +112,7 @@ def predict_evaluate(data_loader, options, model, known_interactions):
         # Predict the items interacted for each user and mask the items which appeared in known interactions
         if options.model in ["FactorizationMachine", "DeepFM", "JSR", "DREM", "HyperSaR"]:
             keyword_ids = batch['keyword_ids'].to(device_embed)
-            query_sizes = batch['query_sizes'].to(device_ops)
+            query_sizes = batch['query_sizes'].to(device_ops) 
             predicted_scores = model.predict(user_ids, keyword_ids, query_sizes)
         else:
             predicted_scores = model.predict(user_ids)
@@ -93,6 +127,29 @@ def predict_evaluate(data_loader, options, model, known_interactions):
                     predicted_scores[i, item] = mask_value
         _, predicted_interactions = torch.topk(predicted_scores, k=max_k, dim=1, largest=True, sorted=True)
         ## Shape of predicted_interactions: (batch_size, num_item)
+
+
+        ##print an example search and retrieval
+
+        ##match id's to real strings
+        item_dict_path = "/home/stu15/s1/cgg3724/ir2023/p1c/hypersar/data/lastfm/item_dict.txt"
+        tag_path = "/home/stu15/s1/cgg3724/ir2023/p1c/hypersar/data/lastfm/tags.dat"
+        artist_path = "/home/stu15/s1/cgg3724/ir2023/p1c/hypersar/data/lastfm/artists.dat"
+        artist_dict = load_artist_dictionary(artist_path)
+        item_dict, tag_dict = load_dictionaries(item_dict_path, tag_path)
+
+
+        if batch_id == 0 and print_example:
+            example_user_id = user_ids[0].item()
+            example_query_keywords = [keyword_id.item() for keyword_id in keyword_ids[0]]
+            example_top_10_hits = predicted_interactions[0, :10].tolist()
+            print(f"Example search for user {example_user_id} with query keywords {example_query_keywords}:")
+            print(f"Top 10 hits: {example_top_10_hits}")
+            example_user_id, example_query_tags, example_artist_names = map_ids_to_values(example_user_id, example_query_keywords, example_top_10_hits, item_dict, tag_dict, artist_dict)
+            print(f"Example search for user {example_user_id} with query tags {example_query_tags}:")
+            print(f"Top 10 hits: {example_artist_names}")
+            print_example = False
+
 
         # Identify the correct interactions in the top-k predicted items
         correct_predicted_interactions = (predicted_interactions == item_ids.unsqueeze(-1)).float()
