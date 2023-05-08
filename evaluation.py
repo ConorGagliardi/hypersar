@@ -132,9 +132,9 @@ def predict_evaluate(data_loader, options, model, known_interactions):
         ##print an example search and retrieval
 
         ##match id's to real strings
-        item_dict_path = "/home/stu15/s1/cgg3724/ir2023/p1c/hypersar/data/lastfm/item_dict.txt"
-        tag_path = "/home/stu15/s1/cgg3724/ir2023/p1c/hypersar/data/lastfm/tags.dat"
-        artist_path = "/home/stu15/s1/cgg3724/ir2023/p1c/hypersar/data/lastfm/artists.dat"
+        item_dict_path = "data/lastfm/item_dict.txt"
+        tag_path = "data/lastfm/tags.dat"
+        artist_path = "data/lastfm/artists.dat"
         artist_dict = load_artist_dictionary(artist_path)
         item_dict, tag_dict = load_dictionaries(item_dict_path, tag_path)
 
