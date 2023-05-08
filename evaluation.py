@@ -141,7 +141,9 @@ def predict_evaluate(data_loader, options, model, known_interactions):
 
         if batch_id == 0 and print_example:
             example_user_id = user_ids[0].item()
-            example_query_keywords = [keyword_id.item() for keyword_id in keyword_ids[0]].remove(-1)
+            example_query_keywords = [keyword_id.item() for keyword_id in keyword_ids[0]]
+            if -1 in example_query_keywords:
+                example_query_keywords = example_query_keywords.remove(-1)
             example_top_10_hits = predicted_interactions[0, :10].tolist()
             print(f"Example search for user {example_user_id} with query keywords {example_query_keywords}:")
             print(f"Top 10 hits: {example_top_10_hits}")
