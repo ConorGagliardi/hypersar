@@ -82,7 +82,10 @@ def load_artist_dictionary(artist_path):
 def map_ids_to_values(example_user_id, example_query_keywords, example_top_10_hits, item_dict, tag_dict, artist_dict):
     example_artist_ids = [item_dict[hit] for hit in example_top_10_hits]
     example_artist_names = [artist_dict[artist_id] for artist_id in example_artist_ids]
-    example_query_tags = [tag_dict[keyword_id] for keyword_id in example_query_keywords]
+    if example_query_keywords == None:
+        example_query_tags = None
+    else:
+        example_query_tags = [tag_dict[keyword_id] for keyword_id in example_query_keywords]
     return example_user_id, example_query_tags, example_artist_names
     
     
