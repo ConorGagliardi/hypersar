@@ -4,8 +4,10 @@ install:
 ftext:
 	python main.py --dataset "lastfm" --model "HyperSaR" --num_layer 2 --edge_dropout 0.1 --loss_weight 0.001
 bert:
-	python main.py --dataset "lastfm" --model "HyperSaR" --num_layer 2 --edge_dropout 0.1 --loss_weight 0.001 --bert
-        
+	python main.py --dataset "lastfm" --model "HyperSaR" --num_layer 2 --edge_dropout 0.1 --loss_weight 0.001 --bert base
+bert_large:
+python main.py --dataset "lastfm" --model "HyperSaR" --num_layer 2 --edge_dropout 0.1 --loss_weight 0.001 --bert large
+
 help:
 	@echo "############### Options: ###############"
 	@echo "install: install requirements"
