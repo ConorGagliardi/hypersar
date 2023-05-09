@@ -147,3 +147,12 @@ The remaining hyperparameters were obtained by a grid search (more details on th
 | Lastfm | HyperSaR | num_layer | 2 |
 | Lastfm | HyperSaR | edge_dropout | 0.2 |
 | Lastfm | HyperSaR | loss_weight | 0.001 |
+
+
+
+## __Using the Makefile__
+The given Makefile includes four scripts that can be run to use the different embeddings:
+* ``install`` : installs required dependencies
+* ``ftext`` : run using FastText embeddings
+* ``bert_base``: run using BERT_Base embeddings
+* ``bert_large``: run using BERT_Large embeddings
