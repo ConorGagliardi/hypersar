@@ -6,7 +6,7 @@ ftext:
 bert_base:
 	python main.py --dataset "lastfm" --model "HyperSaR" --num_layer 2 --edge_dropout 0.1 --loss_weight 0.001 --bert base
 bert_large:
-python main.py --dataset "lastfm" --model "HyperSaR" --num_layer 2 --edge_dropout 0.1 --loss_weight 0.001 --bert large
+	python main.py --dataset "lastfm" --model "HyperSaR" --num_layer 2 --edge_dropout 0.1 --loss_weight 0.001 --bert large
 
 help:
 	@echo "############### Options: ###############"
